@@ -1,66 +1,22 @@
-# mihomo 配置片段：引用 cqr100/mihomo-mrs-rules 生成的 .mrs 规则集
+# mihomo 配置片段：引用 cqr100/mihomo-mrs-rules 生成的规则集
 # 把 rule-providers 和 rules 两段合并进你自己的 config.yaml 即可。
-#
-# 本仓库是私有仓库，raw 链接必须带 token 才能读（无鉴权返回 404，已实测）。
-# 建议单独生成一个只读 token：Fine-grained token，仅授权这一个仓库，权限只给
-# Contents: Read-only，这样即使写进配置文件泄露了损失也有限。
 
 rule-providers:
-  mrs-proxy:
+  mrs-emby:
     type: http
     behavior: domain
     format: mrs
     interval: 86400
     proxy: DIRECT            # 拉取规则集本身走直连，避免回环
     header:
-      Authorization:
-        - "token {YOUR_READONLY_PAT}"   # 写成 "Bearer xxx" 也可以，两种都实测可用
-    url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/proxy.mrs"
-    path: ./ruleset/mrs-proxy.mrs
-
-  mrs-direct:
-    type: http
-    behavior: domain
-    format: mrs
-    interval: 86400
-    proxy: DIRECT
-    header:
-      Authorization:
-        - "token {YOUR_READONLY_PAT}"
-    url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/direct.mrs"
-    path: ./ruleset/mrs-direct.mrs
-
-  mrs-reject:
-    type: http
-    behavior: domain
-    format: mrs
-    interval: 86400
-    proxy: DIRECT
-    header:
-      Authorization:
-        - "token {YOUR_READONLY_PAT}"
-    url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/reject.mrs"
-    path: ./ruleset/mrs-reject.mrs
-
-  mrs-emby:
-    type: http
-    behavior: domain
-    format: mrs
-    interval: 86400
-    proxy: DIRECT
-    header:
+      # 本仓库是私有的，raw 链接必须带 token（无鉴权返回 404）。
+      # 建议单独建 Fine-grained token：只授权这一个仓库，权限只给 Contents: Read-only
       Authorization:
         - "token {YOUR_READONLY_PAT}"
     url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/emby.mrs"
     path: ./ruleset/mrs-emby.mrs
 
-# 规则顺序 = 优先级，越靠前越先匹配，先命中的赢。
-# REJECT 放最前：拦截清单里都是具体的广告/统计域名（如 hm.baidu.com），
-# 而 direct 里是 +.baidu.com 这种大范围后缀，direct 在前会把广告域名一起放行。
 rules:
-  - RULE-SET,mrs-reject,REJECT
-  - RULE-SET,mrs-direct,DIRECT
   - RULE-SET,mrs-emby,{你的Emby策略组}
-  - RULE-SET,mrs-proxy,PROXY
   - GEOIP,CN,DIRECT
   - MATCH,PROXY

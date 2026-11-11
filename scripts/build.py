@@ -122,43 +122,60 @@ def download_mihomo() -> Path:
 # --------------------------------------------------------------------------- #
 # 规则解析
 # --------------------------------------------------------------------------- #
+def _check_domain(domain: str, raw: str) -> str:
+    """校验并小写化一个域名。"""
+    d = domain.strip().lower()
+    if not d:
+        raise ValueError(f"缺少域名：{raw.strip()!r}")
+    if any(ch.isspace() for ch in d):
+        raise ValueError(f"域名中含有空白字符：{raw.strip()!r}")
+    if "/" in d or not VALID_DOMAIN.match(d):
+        raise ValueError(f"无效的域名：{raw.strip()!r}")
+    return d
+
+
 def normalize(raw: str) -> tuple[str, str] | None:
-    """把一行源码规则规范化为 mihomo 认识的写法，返回 (规则, 匹配方式)。"""
+    """把一行源码规则规范化为 mihomo 认识的写法，返回 (规则, 匹配方式)。
+
+    几种写法可以混用，效果相同：
+        DOMAIN,example.com          精确匹配，只命中 example.com 本身
+        DOMAIN-SUFFIX,example.com   后缀匹配，命中 example.com + 所有子域名
+        example.com                 后缀匹配（等价 DOMAIN-SUFFIX）
+        =example.com                精确匹配（等价 DOMAIN）
+        +.example.com               后缀匹配
+        .example.com                只匹配子域名
+        *.example.com               只匹配一级子域名
+    """
     line = raw.split("#", 1)[0].strip()
     if not line:
         return None
+    line = re.sub(r"^-\s+", "", line)      # 容忍从 YAML 列表连带 "- " 一起粘过来
 
-    # 带逗号且首段全大写的是 classical 路由规则（DOMAIN-SUFFIX,x / SUB-RULE,(..),y）。
-    # 这类规则不能进 behavior=domain 的规则集，mihomo 会直接拒绝。
-    probe = re.sub(r"^[-+]\s*", "", line)          # 容忍从 YAML 列表里连带 "- " 一起粘过来
-    head = probe.split(",", 1)[0].strip().upper()
-    if "," in probe and re.fullmatch(r"[A-Z][A-Z0-9-]*", head):
+    upper = line.upper()
+    if upper.startswith("DOMAIN-SUFFIX,"):
+        return (f"+.{_check_domain(line[len('DOMAIN-SUFFIX,'):], raw)}", "suffix")
+    if upper.startswith("DOMAIN,"):
+        return (_check_domain(line[len("DOMAIN,"):], raw), "exact")
+
+    # 其它带逗号的都是 classical 路由规则（SUB-RULE / IP-CIDR / RULE-SET ...），
+    # behavior=domain 的规则集装不下，mihomo 会直接拒绝。
+    head = line.split(",", 1)[0].strip().upper()
+    if "," in line and re.fullmatch(r"[A-Z][A-Z0-9-]*", head):
         raise ValueError(
-            f"{raw.strip()!r} 是 classical 路由规则，不能放进 domain 规则集。"
-            f"SUB-RULE 只能写在 config.yaml 顶层的 rules: 里（见 snippets/emby.rules.yaml）"
+            f"{raw.strip()!r} 不支持。规则集只装域名，只认 DOMAIN, 和 DOMAIN-SUFFIX, 两种前缀；"
+            f"SUB-RULE / IP-CIDR / RULE-SET 这类要写进 config.yaml 顶层的 rules:"
         )
 
-    line = line.lower()
-    if any(ch.isspace() for ch in line):
-        # 域名中间不可能有空格，几乎都是手滑，宁可报错也不要生成垃圾规则
-        raise ValueError(f"域名中含有空白字符：{raw.strip()!r}")
+    if line.startswith("+."):
+        return (_check_domain(line, raw), "suffix")
+    if line.startswith("*."):
+        return (_check_domain(line, raw), "wildcard")
+    if line.startswith("."):
+        return (_check_domain(line, raw), "sub-only")
 
-    mode = "suffix"
-    if line.startswith("="):
-        line, mode = line[1:], "exact"
-    elif line.startswith("+."):
-        return (line, "suffix")
-    elif line.startswith("."):
-        return (line, "sub-only")
-    elif line.startswith("*."):
-        return (line, "wildcard")
-
-    if not VALID_DOMAIN.match(line) or "/" in line:
-        raise ValueError(f"无效的域名：{raw.strip()!r}")
-
-    if mode == "exact":
-        return (line, "exact")
-    return (f"+.{line}", "suffix")
+    mode = "exact" if line.startswith("=") else "suffix"
+    domain = _check_domain(line.lstrip("="), raw)
+    return (domain, "exact") if mode == "exact" else (f"+.{domain}", "suffix")
 
 
 def compile_list(name: str) -> dict:

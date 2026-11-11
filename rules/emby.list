@@ -1,51 +1,34 @@
-# ============================================================
-# Emby 服务器域名
-# ------------------------------------------------------------
-# 只放域名，编译成 dist/emby.mrs，在 config.yaml 里用
-#   - RULE-SET,emby,你的Emby策略组
-# 引用。
-#
-# 默认后缀匹配（域名本身 + 所有子域名）。想严格只匹配这一台
-# 主机，行首加 = ，例如 =emby.my
-#
-# 原来的 SUB-RULE 分流（sub-rule-emby / sub-rule-emby-n）和
-# IP@cloudflare 那条已去掉：SUB-RULE 不能进规则集，需要分流
-# 的话得写回 config.yaml 顶层 rules:。
-# ============================================================
-
+# ----------------------Emby
 # ------------白
-em.mlhyy.top                 # 茉莉
-cn.mlhyy.top                 # 茉莉.cdn
-goemby.entertang.work        # ETFLIX
-goemby.etflix.lol            # ETFLIX.CF
-embygogo.entertang.work      # ETFLIX.embygogo
-emby.my                      # 月饼
-emby.dijia.de                # 乐观
-yxrkemby.haosao.de           # 乐观.CF线路(优选)
-emby.haosao.de               # 乐观.CF线路(无优选)
-xyemby.kingba.com            # 乐观.白线
-emby.taotu.ink               # 乐蛙
-eb.atrct.cn                  # 乐蛙.白
-
+DOMAIN,em.mlhyy.top #茉莉
+DOMAIN,cn.mlhyy.top #茉莉.cdn
+DOMAIN,goemby.entertang.work #ETFLIX
+DOMAIN,goemby.etflix.lol #ETFLIX.CF
+DOMAIN,embygogo.entertang.work #ETFLIX.embygogo
+DOMAIN,emby.my #月饼
+DOMAIN,emby.dijia.de #乐观
+DOMAIN,yxrkemby.haosao.de #乐观.CF线路(优选)
+DOMAIN,emby.haosao.de #乐观.CF线路(无优选)
+DOMAIN,xyemby.kingba.com #乐观.白线
+DOMAIN,emby.taotu.ink #乐蛙
+DOMAIN,eb.atrct.cn #乐蛙.白
 # ------------签到
-emby.levilde.bond            # Levilde Luminia 2.0
-
+DOMAIN,emby.levilde.bond #Levilde Luminia 2.0
 # ------------观保
-emby101.origamiart.uk        # 折纸
-cdn.zhezhi.art               # 折纸.CF
-emby.chapanda.site           # 茶百道
-emby.teawaya.com             # 茶百道.
-jf.dqx99999.shop             # 流光画廊
-line2.dqx99999.shop          # 流光画廊.白线
-yykx.top                     # 营养快线
-emby.di0.uk                  # 帝服
-
+DOMAIN,emby101.origamiart.uk #折纸
+DOMAIN,cdn.zhezhi.art #折纸.CF
+DOMAIN,emby.chapanda.site #茶百道
+DOMAIN,emby.teawaya.com #茶百道.
+DOMAIN,jf.dqx99999.shop #流光画廊
+DOMAIN,line2.dqx99999.shop #流光画廊.白线
+DOMAIN,yykx.top #营养快线
+DOMAIN,emby.di0.uk #帝服
 # ------------公益
-13.yusen.cyou                # 予初
-aaa.yusen6.ccwu.cc           # 予初.
-emby.yusen.us.ci             # 予初.
-embya.yusen.cyou             # 予初.
-emby.yusen.cc.cd             # 予初.
-emby.bangumi.ca              # Nya.
-link00.okemby.org            # OK
-link01.okemby.org            # OK.
+DOMAIN,13.yusen.cyou #予初
+DOMAIN,aaa.yusen6.ccwu.cc #予初.
+DOMAIN,emby.yusen.us.ci #予初.
+DOMAIN,embya.yusen.cyou #予初.
+DOMAIN,emby.yusen.cc.cd #予初.
+DOMAIN,emby.bangumi.ca #Nya.
+DOMAIN,link00.okemby.org #OK
+DOMAIN,link01.okemby.org #OK.
