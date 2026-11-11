@@ -172,7 +172,9 @@ def compile_list(name: str) -> dict:
 
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
     out = BUILD_DIR / f"{name}.txt"
-    out.write_text("\n".join(sorted(seen)) + "\n", encoding="utf-8")
+    # 显式 newline="\n"，避免 Windows 上写出 CRLF 让 git 一直显示已修改
+    with out.open("w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(sorted(seen)) + "\n")
     return {"name": name, "count": len(seen), "modes": seen, "skipped": skipped, "text": out}
 
 
