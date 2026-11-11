@@ -1,6 +1,9 @@
 +.anthropic.com
 +.chatgpt.com
 +.claude.ai
++.docker.com
++.docker.io
++.files.pythonhosted.org
 +.ggpht.com
 +.ghcr.io
 +.github.com
@@ -11,9 +14,12 @@
 +.googleapis.com
 +.googlevideo.com
 +.gstatic.com
++.npmjs.com
++.npmjs.org
 +.oaistatic.com
 +.oaiusercontent.com
 +.openai.com
++.pypi.org
 +.t.me
 +.tdesktop.com
 +.telegram.me
