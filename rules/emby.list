@@ -1,5 +1,10 @@
 # ----------------------Emby（对应原来的 sub-rule-emby）
 # ------------白
+DOMAIN,music.mlhkyyf.kdns.fr #茉莉音乐.cf
+# ------------
+DOMAIN,yxrkemby.haosao.de #乐观.CF线路(优选)
+DOMAIN,emby.haosao.de #乐观.CF线路(无优选)
+# ------------
 DOMAIN,emby.my #月饼
 # ------------签到
 DOMAIN,emby.levilde.bond #Levilde Luminia 2.0
@@ -13,6 +18,12 @@ DOMAIN,emby.teawaya.com #茶百道.
 DOMAIN,jf.dqx99999.shop #流光画廊
 DOMAIN,line2.dqx99999.shop #流光画廊.白线
 # ------------公益
+DOMAIN,13.yusen.cyou #予初
+DOMAIN,aaa.yusen6.ccwu.cc #予初.
+DOMAIN,emby.yusen.us.ci #予初.
+DOMAIN,embya.yusen.cyou #予初.
+DOMAIN,emby.yusen.cc.cd #予初.
+# ------------
 DOMAIN,emby.bangumi.ca #Nya.
 # ------------
 DOMAIN,link00.okemby.org #OK
