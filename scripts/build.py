@@ -39,7 +39,7 @@ DIST_DIR = ROOT / "dist"
 BIN_DIR = ROOT / "bin"
 
 RELEASE_API = "https://api.github.com/repos/MetaCubeX/mihomo/releases/latest"
-UA = {"User-Agent": "mihomo-mrs-rules-builder"}
+UA = {"User-Agent": "curl/8.5.0"}
 
 # 域名允许出现的字符：字母数字、连字符、点、通配符
 VALID_DOMAIN = re.compile(r"^[a-z0-9*+._-]+$")
