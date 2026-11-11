@@ -44,6 +44,20 @@ Actions 只在 `rules/`、`scripts/` 或 workflow 本身变动时触发，手动
 
 > 校验规则很严：任何一行写错（域名带空格、误粘 classical 规则）都会让构建**直接失败**并在 Actions 里报出具体行号，不会静默丢弃。静默丢一条规则 = 某个站点悄悄不走代理，比报错难查得多。
 
+## 速查：某个站点该写到哪
+
+| 想要的效果 | 写到 | 写法 |
+| --- | --- | --- |
+| 直连 | `rules/direct.list` | `baidu.com` |
+| 走代理 | `rules/proxy.list` | `google.com` |
+| 拦截 | `rules/reject.list` | `doubleclick.net` |
+| Emby 服务器 | `rules/emby.list` | `emby.my` |
+| 只匹配这一个域名，不含子域名 | 任意清单 | `=baidu.com` |
+
+**只写域名，不要带 `DOMAIN,` / `DOMAIN-SUFFIX,` 前缀**——那是 `config.yaml` 里的写法，写进清单会构建失败并报错。
+
+同一个域名出现在两份清单里时，谁生效由 `config.yaml` 里 `RULE-SET` 的先后顺序决定，先命中的赢。典型坑：`reject.list` 里的 `hm.baidu.com` 会被 `direct.list` 里的 `+.baidu.com` 抢先匹配，所以 `RULE-SET,mrs-reject` 要排在 `RULE-SET,mrs-direct` 前面（`config.example.yaml` 已按此排序）。
+
 ## 哪些规则进不了 .mrs
 
 `SUB-RULE` 这类规则**不能**编译成规则集，mihomo 会明确拒绝（实测）：

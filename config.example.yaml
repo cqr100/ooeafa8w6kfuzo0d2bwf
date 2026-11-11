@@ -54,11 +54,12 @@ rule-providers:
     url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/emby.mrs"
     path: ./ruleset/mrs-emby.mrs
 
-# 规则顺序 = 优先级，越靠前越先匹配。
-# 直连白名单放最前面，避免国内域名被后面的代理规则误伤。
+# 规则顺序 = 优先级，越靠前越先匹配，先命中的赢。
+# REJECT 放最前：拦截清单里都是具体的广告/统计域名（如 hm.baidu.com），
+# 而 direct 里是 +.baidu.com 这种大范围后缀，direct 在前会把广告域名一起放行。
 rules:
-  - RULE-SET,mrs-direct,DIRECT
   - RULE-SET,mrs-reject,REJECT
+  - RULE-SET,mrs-direct,DIRECT
   - RULE-SET,mrs-emby,{你的Emby策略组}
   - RULE-SET,mrs-proxy,PROXY
   - GEOIP,CN,DIRECT
