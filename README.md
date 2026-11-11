@@ -12,6 +12,7 @@
 rules/          你手写的域名清单（唯一需要改的地方）
 build/          规范化后的中间产物（自动生成，可读）
 dist/           最终 .mrs 规则集（自动生成，给 mihomo 用）
+snippets/       不能编译成 .mrs、只能粘贴进 config.yaml 的规则片段
 scripts/build.py 编译脚本（本地 / CI 通用）
 config.example.yaml  mihomo 引用示例
 ```
@@ -39,6 +40,29 @@ Actions 只在 `rules/`、`scripts/` 或 workflow 本身变动时触发，手动
 > 注意：mihomo 原生 `domain` 规则集里，裸域名是**精确匹配**。本仓库把裸域名自动补成 `+.`（后缀匹配），因为手写清单时 99% 的场景都是想匹配整个站点。真要精确匹配请写 `=example.com`。
 
 新增清单文件：在 `rules/` 下新建 `xxx.list`，不用改 workflow，下次构建自动带上。
+
+> 校验规则很严：任何一行写错（域名带空格、误粘 classical 规则）都会让构建**直接失败**并在 Actions 里报出具体行号，不会静默丢弃。静默丢一条规则 = 某个站点悄悄不走代理，比报错难查得多。
+
+## 哪些规则进不了 .mrs
+
+`SUB-RULE` 这类规则**不能**编译成规则集。mihomo 会明确拒绝（实测）：
+
+```
+parse classical rule [SUB-RULE,(DOMAIN,em.mlhyy.top),sub-rule-emby-n] error:
+unsupported rule type on classical rule-set: SUB-RULE
+```
+
+原因：`SUB-RULE` 的第二个参数指向 `sub-rules:` 里定义的规则链，而规则集是独立文件，没有这个上下文。所以这类规则只能写在 `config.yaml` **顶层**的 `rules:` 里。
+
+`SUB-RULE`、`DOMAIN-SUFFIX`、`IP-CIDR`、`RULE-SET` 这些带逗号的路由规则都属于这种情况，统一放 `snippets/`：
+
+```
+snippets/emby.rules.yaml   Emby 相关规则，可直接粘到 config.yaml 的 rules: 下
+```
+
+`snippets/*.yaml` 里的内容是**完整可粘贴的 YAML 片段**（带 `- ` 前缀），不参与编译，也不会被 build.py 处理。
+
+注意：`snippets/emby.rules.yaml` 依赖你 `config.yaml` 里已有的 `sub-rules:` 定义（`sub-rule-emby`、`sub-rule-emby-n`）和 `IP@cloudflare` 这个 rule-set provider，缺任何一个都会启动失败。
 
 ## 本地编译
 

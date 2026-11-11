@@ -128,6 +128,16 @@ def normalize(raw: str) -> tuple[str, str] | None:
     if not line:
         return None
 
+    # 带逗号且首段全大写的是 classical 路由规则（DOMAIN-SUFFIX,x / SUB-RULE,(..),y）。
+    # 这类规则不能进 behavior=domain 的规则集，mihomo 会直接拒绝。
+    probe = re.sub(r"^[-+]\s*", "", line)          # 容忍从 YAML 列表里连带 "- " 一起粘过来
+    head = probe.split(",", 1)[0].strip().upper()
+    if "," in probe and re.fullmatch(r"[A-Z][A-Z0-9-]*", head):
+        raise ValueError(
+            f"{raw.strip()!r} 是 classical 路由规则，不能放进 domain 规则集。"
+            f"SUB-RULE 只能写在 config.yaml 顶层的 rules: 里（见 snippets/emby.rules.yaml）"
+        )
+
     line = line.lower()
     if any(ch.isspace() for ch in line):
         # 域名中间不可能有空格，几乎都是手滑，宁可报错也不要生成垃圾规则
@@ -198,8 +208,6 @@ def summarize(result: dict, dst: Path) -> None:
     detail = "、".join(f"{k} {v}" for k, v in sorted(modes.items()))
     size = dst.stat().st_size
     print(f"  {result['name']:<12} {result['count']:>5} 条  {size:>7} B   ({detail})")
-    for line in result["skipped"]:
-        print(f"  ! 已跳过{line}")
 
 
 def main() -> None:
@@ -226,10 +234,21 @@ def main() -> None:
         sys.exit("rules/ 下没有找到任何 .list 文件")
 
     print(f"[mihomo] {mihomo}")
+
+    # 先把所有清单解析完，有任何一行不合法就整体失败：
+    # 静默丢弃一条规则 = 某个站点悄悄不走代理，比直接报错难查得多。
+    print("[build] 解析规则 ...")
+    results = [compile_list(name) for name in names]
+    problems = [(r["name"], line) for r in results for line in r["skipped"]]
+    if problems:
+        print("[build] 解析失败，以下规则有问题：", file=sys.stderr)
+        for name, line in problems:
+            print(f"  rules/{name}.list {line}", file=sys.stderr)
+        sys.exit(1)
+
     print("[build] 编译中 ...")
-    for name in names:
-        result = compile_list(name)
-        dst = convert(mihomo, name)
+    for result in results:
+        dst = convert(mihomo, result["name"])
         summarize(result, dst)
     print(f"[build] 完成，产物在 {DIST_DIR.relative_to(ROOT)}/")
 
