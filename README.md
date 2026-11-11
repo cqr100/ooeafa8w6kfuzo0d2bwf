@@ -57,7 +57,6 @@ rule-providers:
     behavior: domain
     format: mrs
     interval: 86400
-    proxy: DIRECT
     header:
       Authorization:
         - "token {只读PAT}"          # 私有仓库必须带，无鉴权返回 404
@@ -71,6 +70,8 @@ rules:
 ```
 
 `{只读PAT}` 建议单独建一个 Fine-grained token：只授权 `mihomo-mrs-rules` 这一个仓库，权限只给 **Contents: Read-only**。别把账号级的 classic token 写进配置文件。
+
+关于 `proxy` 字段：**不写就行**。不写时这个下载请求走正常规则匹配（通常经代理下载，最稳）；写了就强制指定出站，跳过规则匹配——比如 `proxy: DIRECT` 是强制直连，但本地直连 `raw.githubusercontent.com` 不通时会下载失败。只有遇到「代理还没起来、规则集拉不到」的启动时序问题才需要加。
 
 ### 复用已有的 `mrsdomain` 锚点
 
@@ -86,7 +87,6 @@ mrsdomain: &mrsdomain {type: http, interval: 86400, behavior: domain, format: mr
 rule-providers:
   mrs-emby:
     <<: *mrsdomain
-    proxy: DIRECT
     header:
       Authorization:
         - "token {只读PAT}"
@@ -103,7 +103,6 @@ rule-providers:
 
 ```yaml
 mrsauth: &mrsauth
-  proxy: DIRECT
   header:
     Authorization:
       - "token {只读PAT}"
