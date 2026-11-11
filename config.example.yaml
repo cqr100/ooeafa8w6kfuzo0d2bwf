@@ -1,22 +1,42 @@
-# mihomo 配置片段：引用 cqr100/mihomo-mrs-rules 生成的规则集
-# 把 rule-providers 和 rules 两段合并进你自己的 config.yaml 即可。
+# mihomo 配置片段：复用你已有的 mrsdomain 锚点，引用 emby.mrs
+#
+# 前提：你的 config.yaml 里已经有这个锚点（不用改它，一个字都不用动）：
+#   mrsdomain: &mrsdomain {type: http, interval: 86400, behavior: domain, format: mrs}
+#
+# 锚点里已有 type / interval / behavior / format 四个字段，
+# 每个 provider 还必须各自给 url / path，私有仓库再加 header。
 
 rule-providers:
   mrs-emby:
-    type: http
-    behavior: domain
-    format: mrs
-    interval: 86400
-    proxy: DIRECT            # 拉取规则集本身走直连，避免回环
+    <<: *mrsdomain                       # 合并锚点，锚点本身不受影响
+    proxy: DIRECT                        # 拉规则集本身走直连，避免回环
     header:
-      # 本仓库是私有的，raw 链接必须带 token（无鉴权返回 404）。
-      # 建议单独建 Fine-grained token：只授权这一个仓库，权限只给 Contents: Read-only
+      # 私有仓库必须带 token，裸链返回 404
+      # 建议用 Fine-grained token：只授权本仓库，权限只给 Contents: Read-only
       Authorization:
         - "token {YOUR_READONLY_PAT}"
     url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/emby.mrs"
-    path: ./ruleset/mrs-emby.mrs
+    path: ./ruleset/mrs-emby.mrs         # 每个 provider 的 path 必须不同，否则缓存互相覆盖
 
 rules:
   - RULE-SET,mrs-emby,{你的Emby策略组}
   - GEOIP,CN,DIRECT
   - MATCH,PROXY
+
+# ---------------------------------------------------------------------------
+# 可选：再定义一个认证锚点，多个 provider 复用同一套 header / proxy
+#
+#   mrsauth: &mrsauth
+#     proxy: DIRECT
+#     header:
+#       Authorization:
+#         - "token {YOUR_READONLY_PAT}"
+#
+# 然后一行合并两个锚点（已实测 mihomo 支持）：
+#
+#   rule-providers:
+#     mrs-emby:
+#       <<: [*mrsdomain, *mrsauth]
+#       url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/emby.mrs"
+#       path: ./ruleset/mrs-emby.mrs
+# ---------------------------------------------------------------------------

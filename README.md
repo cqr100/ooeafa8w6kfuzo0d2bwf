@@ -72,6 +72,49 @@ rules:
 
 `{只读PAT}` 建议单独建一个 Fine-grained token：只授权 `mihomo-mrs-rules` 这一个仓库，权限只给 **Contents: Read-only**。别把账号级的 classic token 写进配置文件。
 
+### 复用已有的 `mrsdomain` 锚点
+
+如果你 config 里已经有
+
+```yaml
+mrsdomain: &mrsdomain {type: http, interval: 86400, behavior: domain, format: mrs}
+```
+
+**不用改它**，用 YAML 合并键 `<<:` 引用就行（已实测 mihomo 支持）：
+
+```yaml
+rule-providers:
+  mrs-emby:
+    <<: *mrsdomain
+    proxy: DIRECT
+    header:
+      Authorization:
+        - "token {只读PAT}"
+    url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/emby.mrs"
+    path: ./ruleset/mrs-emby.mrs
+```
+
+要点：
+
+- 锚点里已有 `type / interval / behavior / format`，provider 只需补 `url` / `path`（私有仓库再加 `header`）
+- 自己写的键会**覆盖**锚点里的同名字段，比如想缩短更新间隔就单独写 `interval: 3600`
+- 每个 provider 的 `path` 必须不同，否则多个 provider 会共用同一个缓存文件，内容互相覆盖
+- 多个 provider 想复用同一套认证，再定义一个锚点，一行合并两个（已实测可用）：
+
+```yaml
+mrsauth: &mrsauth
+  proxy: DIRECT
+  header:
+    Authorization:
+      - "token {只读PAT}"
+
+rule-providers:
+  mrs-emby:
+    <<: [*mrsdomain, *mrsauth]
+    url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/emby.mrs"
+    path: ./ruleset/mrs-emby.mrs
+```
+
 改完规则集后 mihomo 不会立刻生效（有 `interval` 缓存），重启内核或调 `PUT /providers/rules/mrs-emby` 强制刷新。
 
 ## 本地编译（可选）
