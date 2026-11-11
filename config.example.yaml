@@ -42,11 +42,24 @@ rule-providers:
     url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/reject.mrs"
     path: ./ruleset/mrs-reject.mrs
 
+  mrs-emby:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    proxy: DIRECT
+    header:
+      Authorization:
+        - "token {YOUR_READONLY_PAT}"
+    url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/emby.mrs"
+    path: ./ruleset/mrs-emby.mrs
+
 # 规则顺序 = 优先级，越靠前越先匹配。
 # 直连白名单放最前面，避免国内域名被后面的代理规则误伤。
 rules:
   - RULE-SET,mrs-direct,DIRECT
   - RULE-SET,mrs-reject,REJECT
+  - RULE-SET,mrs-emby,{你的Emby策略组}
   - RULE-SET,mrs-proxy,PROXY
   - GEOIP,CN,DIRECT
   - MATCH,PROXY
