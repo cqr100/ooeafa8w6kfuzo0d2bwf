@@ -1,0 +1,19 @@
+# ----------------------Emby（对应原来的 sub-rule-emby-n）
+# ------------白
+DOMAIN,em.mlhyy.top #茉莉
+DOMAIN,cn.mlhyy.top #茉莉.cdn
+DOMAIN,goemby.entertang.work #ETFLIX
+DOMAIN,goemby.etflix.lol #ETFLIX.CF
+DOMAIN,embygogo.entertang.work #ETFLIX.embygogo
+DOMAIN,emby.dijia.de #乐观
+DOMAIN,yxrkemby.haosao.de #乐观.CF线路(优选)
+DOMAIN,emby.haosao.de #乐观.CF线路(无优选)
+DOMAIN,xyemby.kingba.com #乐观.白线
+DOMAIN,emby.taotu.ink #乐蛙
+DOMAIN,eb.atrct.cn #乐蛙.白
+# ------------公益
+DOMAIN,13.yusen.cyou #予初
+DOMAIN,aaa.yusen6.ccwu.cc #予初.
+DOMAIN,emby.yusen.us.ci #予初.
+DOMAIN,embya.yusen.cyou #予初.
+DOMAIN,emby.yusen.cc.cd #予初.
