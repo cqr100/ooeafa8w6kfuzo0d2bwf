@@ -43,6 +43,13 @@ scripts/build.py      编译脚本
 
 ## 在 mihomo 里用
 
+**永久链接**（实测 mihomo 可正常远程拉取）：
+
+- 跟随最新版：`https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/emby.mrs`
+- 锁定某个版本（内容永不变化）：把上面的 `main` 换成 commit SHA
+
+仓库是私有的，**链接必须带 token**，裸链返回 404（GitHub 硬限制）。配置：
+
 ```yaml
 rule-providers:
   mrs-emby:
@@ -63,7 +70,7 @@ rules:
   - MATCH,PROXY
 ```
 
-`{只读PAT}` 建议单独建一个 Fine-grained token：只授权 `mihomo-mrs-rules` 这一个仓库，权限只给 **Contents: Read-only**。
+`{只读PAT}` 建议单独建一个 Fine-grained token：只授权 `mihomo-mrs-rules` 这一个仓库，权限只给 **Contents: Read-only**。别把账号级的 classic token 写进配置文件。
 
 改完规则集后 mihomo 不会立刻生效（有 `interval` 缓存），重启内核或调 `PUT /providers/rules/mrs-emby` 强制刷新。
 
