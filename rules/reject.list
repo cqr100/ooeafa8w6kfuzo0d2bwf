@@ -1,0 +1,38 @@
+# ============================================================
+# 广告 / 统计 / 追踪域名（建议走 REJECT）
+# ------------------------------------------------------------
+# 写法同 proxy.list。误杀正常站点时把对应行删掉即可。
+# ============================================================
+
+doubleclick.net
+googlesyndication.com
+googleadservices.com
+google-analytics.com
+googletagmanager.com
+googletagservices.com
+adservice.google.com
+2mdn.net
+
+scorecardresearch.com
+quantserve.com
+adnxs.com
+criteo.com
+criteo.net
+taboola.com
+outbrain.com
+moatads.com
+adsrvr.org
+rubiconproject.com
+pubmatic.com
+smartadserver.com
+
+umeng.com
+umengcloud.com
+cnzz.com
+talkingdata.com
+growingio.com
+hm.baidu.com
+
+ads.twitter.com
+ads.linkedin.com
+ads.youtube.com

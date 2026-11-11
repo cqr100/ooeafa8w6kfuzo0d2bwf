@@ -1,0 +1,11 @@
+# 本机下载的 mihomo 内核
+bin/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# 系统垃圾文件
+.DS_Store
+Thumbs.db
+desktop.ini

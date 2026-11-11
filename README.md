@@ -1,0 +1,85 @@
+# mihomo-mrs-rules
+
+用自己的域名清单，自动编译出 [mihomo](https://github.com/MetaCubeX/mihomo) 的 **MRS** 格式规则集。
+
+改 `rules/*.list` → push → GitHub Actions 自动生成 `dist/*.mrs` 并提交回仓库。不用本地装任何东西。
+
+## 目录结构
+
+```
+rules/          你手写的域名清单（唯一需要改的地方）
+build/          规范化后的中间产物（自动生成，可读）
+dist/           最终 .mrs 规则集（自动生成，给 mihomo 用）
+scripts/build.py 编译脚本（本地 / CI 通用）
+config.example.yaml  mihomo 引用示例
+```
+
+## 日常用法
+
+1. 打开 `rules/proxy.list`，加一行 `newdomain.com`
+2. commit + push
+3. 等 Actions 跑完（约 1 分钟），`dist/proxy.mrs` 已更新
+
+Actions 只在 `rules/`、`scripts/` 或 workflow 本身变动时触发，手动重建在 Actions 页面点 **Run workflow**。
+
+## 规则写法
+
+每行一条，空行和 `#` 注释忽略，大小写不敏感。
+
+| 写法 | 编译成 | 匹配范围 |
+| --- | --- | --- |
+| `example.com` | `+.example.com` | example.com 本身 + 所有子域名（**默认，推荐**） |
+| `+.example.com` | `+.example.com` | 同上，显式写法 |
+| `.example.com` | `.example.com` | 只匹配子域名，不含 example.com 本身 |
+| `*.example.com` | `*.example.com` | 只匹配一级子域名 |
+| `=example.com` | `example.com` | 精确匹配，只匹配 example.com |
+
+> 注意：mihomo 原生 `domain` 规则集里，裸域名是**精确匹配**。本仓库把裸域名自动补成 `+.`（后缀匹配），因为手写清单时 99% 的场景都是想匹配整个站点。真要精确匹配请写 `=example.com`。
+
+新增清单文件：在 `rules/` 下新建 `xxx.list`，不用改 workflow，下次构建自动带上。
+
+## 本地编译
+
+```bash
+python scripts/build.py --download-mihomo   # 自动下载 mihomo 到 bin/ 再编译
+python scripts/build.py                     # 内核已就绪时直接编译
+python scripts/build.py proxy reject        # 只编译指定列表
+```
+
+需要 Python 3.9+。也可以自己装好 mihomo 后设置 `MIHOMO_BIN` 环境变量指过去。
+
+## 在 mihomo 里引用
+
+完整示例见 `config.example.yaml`。核心就是：
+
+```yaml
+rule-providers:
+  mrs-proxy:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    url: "https://raw.githubusercontent.com/{OWNER}/{REPO}/main/dist/proxy.mrs"
+    path: ./ruleset/mrs-proxy.mrs
+
+rules:
+  - RULE-SET,mrs-proxy,PROXY
+```
+
+### 私有仓库怎么读？
+
+`raw.githubusercontent.com` 对私有仓库要鉴权，mihomo 本身没有登录概念，所以三选一：
+
+1. **带 token 拉取**（配置里写死 PAT，见 `config.example.yaml` 的 `header` 段）——能用，但 token 会存在配置文件里，建议用 fine-grained PAT 且只给这一个仓库的 Contents 读权限。
+2. **同步到公开仓库**——本仓库的 workflow 已内置 `publish` job：在 Settings → Variables 建 `PUBLIC_REPO=用户名/仓库名`，Secrets 建 `PUBLISH_TOKEN`（对该公开仓库有写权限的 PAT），之后每次构建自动把 `dist/*.mrs` 同步过去，mihomo 用公开 URL 直接拉。**推荐**。
+3. **本地文件**——同一台机器上跑 mihomo 的话，`type: file` 指向克隆下来的 `dist/proxy.mrs`，配个定时 `git pull` 就行，完全不联网。
+
+## 为什么用 MRS
+
+- 体积小：同样内容通常只有 YAML 的 1/5 到 1/3
+- 加载快：二进制结构，启动时不用解析文本
+- 内存省：路由器的低配设备上差别明显
+
+## 版本
+
+`mihomo` 内核版本由 `scripts/build.py` 自动取**最新 release**，想锁版本就改 `scripts/build.py` 里的 `RELEASE_API` 指向具体 tag。

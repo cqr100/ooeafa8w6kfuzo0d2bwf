@@ -1,0 +1,86 @@
+name: build-mrs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "rules/**"
+      - "scripts/**"
+      - ".github/workflows/build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-mrs
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 下载 mihomo 内核
+        run: python3 scripts/build.py --only-fetch
+
+      - name: 编译 rules/*.list -> dist/*.mrs
+        run: python3 scripts/build.py
+
+      - name: 提交生成的规则集
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add build dist
+          if git diff --cached --quiet; then
+            echo "产物无变化，跳过提交"
+          else
+            git commit -m "chore: 重新生成 mrs ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+            git push
+          fi
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: mrs
+          path: dist/*.mrs
+          if-no-files-found: error
+
+  # 可选：把 dist/*.mrs 同步到一个「公开」仓库，方便 mihomo 直接按 URL 拉取。
+  # 启用方式：仓库 Settings -> Variables 新建 PUBLIC_REPO = 用户名/仓库名，
+  #          Secrets 新建 PUBLISH_TOKEN = 对该公开仓库有写权限的 PAT。
+  # 不设置变量时这一步整体跳过，不影响构建。
+  publish:
+    needs: build
+    if: vars.PUBLIC_REPO != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: src
+
+      - name: 同步到公开仓库
+        env:
+          TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+          TARGET: ${{ vars.PUBLIC_REPO }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/${TARGET}.git" out
+          mkdir -p out/mrs
+          cp src/dist/*.mrs out/mrs/
+          cd out
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "公开仓库已是最新"
+          else
+            git commit -m "sync: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi

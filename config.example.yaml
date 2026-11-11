@@ -1,0 +1,50 @@
+# mihomo 配置片段示例：引用本仓库生成的 .mrs 规则集
+# 把下面 rule-providers 与 rules 两段合并进你自己的 config.yaml
+# 注意：{OWNER} / {REPO} 换成你的 GitHub 用户名和仓库名
+
+rule-providers:
+  mrs-proxy:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    proxy: DIRECT            # 拉取规则集本身走直连，避免回环
+    # 私有仓库需要带上 token 才能读 raw 文件
+    header:
+      Authorization:
+        - "Bearer {YOUR_PAT}"
+    url: "https://raw.githubusercontent.com/{OWNER}/{REPO}/main/dist/proxy.mrs"
+    path: ./ruleset/mrs-proxy.mrs
+
+  mrs-direct:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    proxy: DIRECT
+    header:
+      Authorization:
+        - "Bearer {YOUR_PAT}"
+    url: "https://raw.githubusercontent.com/{OWNER}/{REPO}/main/dist/direct.mrs"
+    path: ./ruleset/mrs-direct.mrs
+
+  mrs-reject:
+    type: http
+    behavior: domain
+    format: mrs
+    interval: 86400
+    proxy: DIRECT
+    header:
+      Authorization:
+        - "Bearer {YOUR_PAT}"
+    url: "https://raw.githubusercontent.com/{OWNER}/{REPO}/main/dist/reject.mrs"
+    path: ./ruleset/mrs-reject.mrs
+
+# 规则顺序 = 优先级，越靠前越先匹配。
+# 直连白名单放在最前面，避免国内域名被前面的代理规则误伤。
+rules:
+  - RULE-SET,mrs-direct,DIRECT
+  - RULE-SET,mrs-reject,REJECT
+  - RULE-SET,mrs-proxy,PROXY
+  - GEOIP,CN,DIRECT
+  - MATCH,PROXY
