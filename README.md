@@ -4,6 +4,8 @@
 
 改 `rules/*.list` → push → GitHub Actions 自动生成 `dist/*.mrs` 并提交回仓库。不用本地装任何东西。
 
+仓库地址：`https://github.com/cqr100/mihomo-mrs-rules`（私有）
+
 ## 目录结构
 
 ```
@@ -59,7 +61,10 @@ rule-providers:
     behavior: domain
     format: mrs
     interval: 86400
-    url: "https://raw.githubusercontent.com/{OWNER}/{REPO}/main/dist/proxy.mrs"
+    header:
+      Authorization:
+        - "token {YOUR_READONLY_PAT}"
+    url: "https://raw.githubusercontent.com/cqr100/mihomo-mrs-rules/main/dist/proxy.mrs"
     path: ./ruleset/mrs-proxy.mrs
 
 rules:
@@ -68,10 +73,10 @@ rules:
 
 ### 私有仓库怎么读？
 
-`raw.githubusercontent.com` 对私有仓库要鉴权，mihomo 本身没有登录概念，所以三选一：
+`raw.githubusercontent.com` 对私有仓库要鉴权，无鉴权直接返回 404（已实测），而 mihomo 本身没有登录概念，所以三选一：
 
-1. **带 token 拉取**（配置里写死 PAT，见 `config.example.yaml` 的 `header` 段）——能用，但 token 会存在配置文件里，建议用 fine-grained PAT 且只给这一个仓库的 Contents 读权限。
-2. **同步到公开仓库**——本仓库的 workflow 已内置 `publish` job：在 Settings → Variables 建 `PUBLIC_REPO=用户名/仓库名`，Secrets 建 `PUBLISH_TOKEN`（对该公开仓库有写权限的 PAT），之后每次构建自动把 `dist/*.mrs` 同步过去，mihomo 用公开 URL 直接拉。**推荐**。
+1. **带 token 拉取**（当前默认方案，已实测 200 可用）——配置里写死一个只读 PAT。`Authorization: token xxx` 和 `Bearer xxx` 两种写法都行。建议用 fine-grained token，只授权这一个仓库、只给 Contents 读权限，泄露风险可控。
+2. **同步到公开仓库**——workflow 已内置 `publish` job：在 Settings → Variables 建 `PUBLIC_REPO=用户名/仓库名`，Secrets 建 `PUBLISH_TOKEN`（对该公开仓库有写权限的 PAT），之后每次构建自动把 `dist/*.mrs` 同步过去，mihomo 用公开 URL 匿名拉取，配置文件里不用放 token。
 3. **本地文件**——同一台机器上跑 mihomo 的话，`type: file` 指向克隆下来的 `dist/proxy.mrs`，配个定时 `git pull` 就行，完全不联网。
 
 ## 为什么用 MRS
