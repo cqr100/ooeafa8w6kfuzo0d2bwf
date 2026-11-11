@@ -1,7 +1,6 @@
 cdn.zhezhi.art
 emby.bangumi.ca
 emby.chapanda.site
-emby.di0.uk
 emby.levilde.bond
 emby.my
 emby.teawaya.com
@@ -10,4 +9,3 @@ jf.dqx99999.shop
 line2.dqx99999.shop
 link00.okemby.org
 link01.okemby.org
-yykx.top
