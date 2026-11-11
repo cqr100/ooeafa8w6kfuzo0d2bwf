@@ -1,0 +1,9 @@
+# 统一换行，避免 Windows / CI 之间反复 diff
+* text=auto eol=lf
+
+# 二进制产物，绝不能被换行符转换污染
+*.mrs binary
+
+*.py  text eol=lf
+*.yml text eol=lf
+*.list text eol=lf
