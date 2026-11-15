@@ -1,8 +1,5 @@
 # ----------------------Emby（对应原来的 sub-rule-emby）
 # ------------白
-DOMAIN,music.mlhkyyf.kdns.fr #茉莉音乐.cf
-DOMAIN,xjyj.mlhyy.top #茉莉音乐.线路
-# ------------
 DOMAIN,yxrkemby.haosao.de #乐观.CF线路(优选)
 DOMAIN,emby.haosao.de #乐观.CF线路(无优选)
 # ------------
@@ -19,7 +16,7 @@ DOMAIN,emby.teawaya.com #茶百道.
 DOMAIN,jf.dqx99999.shop #流光画廊
 DOMAIN,line2.dqx99999.shop #流光画廊.白线
 # ------------公益
-DOMAIN,emby.bangumi.ca #Nya.
+#DOMAIN,emby.bangumi.ca #Nya.
 # ------------
-DOMAIN,link00.okemby.org #OK
-DOMAIN,link01.okemby.org #OK.
+#DOMAIN,link00.okemby.org #OK
+#DOMAIN,link01.okemby.org #OK.
