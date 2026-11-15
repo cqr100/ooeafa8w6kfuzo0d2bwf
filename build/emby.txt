@@ -1,5 +1,4 @@
 cdn.zhezhi.art
-emby.bangumi.ca
 emby.chapanda.site
 emby.haosao.de
 emby.levilde.bond
@@ -8,8 +7,4 @@ emby.teawaya.com
 emby101.origamiart.uk
 jf.dqx99999.shop
 line2.dqx99999.shop
-link00.okemby.org
-link01.okemby.org
-music.mlhkyyf.kdns.fr
-xjyj.mlhyy.top
 yxrkemby.haosao.de
