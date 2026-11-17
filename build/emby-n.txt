@@ -2,6 +2,7 @@ cn.mlhyy.top
 eb.atrct.cn
 em.mlhyy.top
 emby.dijia.de
+emby.haosao.de
 emby.taotu.ink
 embygogo.entertang.work
 goemby.entertang.work
@@ -9,4 +10,5 @@ goemby.etflix.lol
 music.mlhkyyf.kdns.fr
 xjyj.mlhyy.top
 xyemby.kingba.com
+yxrkemby.haosao.de
 zlyy.mlhyy.top
