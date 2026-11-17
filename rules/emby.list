@@ -1,11 +1,6 @@
 # ----------------------Emby（对应原来的 sub-rule-emby）
 # ------------白
-DOMAIN,yxrkemby.haosao.de #乐观.CF线路(优选)
-DOMAIN,emby.haosao.de #乐观.CF线路(无优选)
-# ------------
 DOMAIN,emby.my #月饼
-# ------------签到
-DOMAIN,emby.levilde.bond #Levilde Luminia 2.0
 # ------------观保
 DOMAIN,emby101.origamiart.uk #折纸
 DOMAIN,cdn.zhezhi.art #折纸.CF
