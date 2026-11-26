@@ -11,7 +11,7 @@ DOMAIN,emby.teawaya.com #茶百道.
 DOMAIN,jf.dqx99999.shop #流光画廊
 DOMAIN,line2.dqx99999.shop #流光画廊.白线
 # ------------公益
-#DOMAIN,emby.bangumi.ca #Nya.
+DOMAIN,emby.bangumi.ca #Nya.
 # ------------
-#DOMAIN,link00.okemby.org #OK
-#DOMAIN,link01.okemby.org #OK.
+DOMAIN,link00.okemby.org #OK
+DOMAIN,link01.okemby.org #OK.
